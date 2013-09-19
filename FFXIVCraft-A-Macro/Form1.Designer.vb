@@ -82,6 +82,7 @@ Partial Class frmMain
         Me.txtWaitBuff = New System.Windows.Forms.TextBox()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
+        Me.chkAlert = New System.Windows.Forms.CheckBox()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox10.SuspendLayout()
@@ -590,7 +591,7 @@ Partial Class frmMain
         Me.chkAutoCopy.AutoSize = True
         Me.chkAutoCopy.Checked = True
         Me.chkAutoCopy.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkAutoCopy.Location = New System.Drawing.Point(12, 504)
+        Me.chkAutoCopy.Location = New System.Drawing.Point(11, 495)
         Me.chkAutoCopy.Name = "chkAutoCopy"
         Me.chkAutoCopy.Size = New System.Drawing.Size(113, 17)
         Me.chkAutoCopy.TabIndex = 38
@@ -659,11 +660,22 @@ Partial Class frmMain
         Me.Label3.TabIndex = 45
         Me.Label3.Text = "Action Wait:"
         '
+        'chkAlert
+        '
+        Me.chkAlert.AutoSize = True
+        Me.chkAlert.Location = New System.Drawing.Point(11, 513)
+        Me.chkAlert.Name = "chkAlert"
+        Me.chkAlert.Size = New System.Drawing.Size(105, 17)
+        Me.chkAlert.TabIndex = 46
+        Me.chkAlert.Text = "Multi-Macro Alert"
+        Me.chkAlert.UseVisualStyleBackColor = True
+        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(630, 535)
+        Me.Controls.Add(Me.chkAlert)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.txtWaitBuff)
@@ -755,5 +767,6 @@ Partial Class frmMain
     Friend WithEvents txtWaitBuff As System.Windows.Forms.TextBox
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents Label3 As System.Windows.Forms.Label
+    Friend WithEvents chkAlert As System.Windows.Forms.CheckBox
 
 End Class

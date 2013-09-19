@@ -2,7 +2,7 @@
     Dim intMacroIndex As Integer = 2
     Dim intLineIndex() As Integer
     Dim strMacros() As String
-    Dim intCP(49, 14) As Integer
+    Dim intCP(49, 15) As Integer
     Dim intTotalCP As Integer
     Dim intBaseCp As Integer
 
@@ -51,7 +51,7 @@
     Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         'Setup all tooltip information
         ToolTip.SetToolTip(btnBasicSynth, "Basic Synthesis" & vbNewLine & "Increases progress" & vbNewLine & "Efficiency: 100%" & vbNewLine & "Success Rate: 90%")
-        ToolTip.SetToolTip(btnStandardSynth, "Standard Synthesis" & vbNewLine & vbNewLine & "CP: 15" & "Increases progress" & vbNewLine & "Efficiency: 150%" & vbNewLine & "Success Rate: 90%")
+        ToolTip.SetToolTip(btnStandardSynth, "Standard Synthesis" & vbNewLine & "CP: 15" & vbNewLine & "Increases progress" & vbNewLine & "Efficiency: 150%" & vbNewLine & "Success Rate: 90%")
         ToolTip.SetToolTip(btnBasicTouch, "Basic Touch" & vbNewLine & "CP: 18" & vbNewLine & "Increases quality" & vbNewLine & "Efficiency: 100%" & vbNewLine & "Success Rate: 70%")
         ToolTip.SetToolTip(btnStandardTouch, "Standard Touch" & vbNewLine & "CP: 32" & vbNewLine & "Increases quality" & vbNewLine & "Efficiency: 125%" & vbNewLine & "Success Rate: 80%")
         ToolTip.SetToolTip(btnAdvancedTouch, "Advanced Touch" & vbNewLine & "CP: 48" & vbNewLine & "Increases quality" & vbNewLine & "Efficiency: 150%" & vbNewLine & "Success Rate: 90%")
@@ -86,9 +86,11 @@
         ToolTip.SetToolTip(btnTricksOfTheTrade, "Tricks of the Trade" & vbNewLine & "Restores 20 cp. Can only be used" & vbNewLine & "when material condition is good")
         ToolTip.SetToolTip(btnComfortZone, "Comfort Zone" & vbNewLine & "CP: 66" & vbNewLine & "Restores 8 CP after each step" & vbNewLine & "for the next ten steps")
         ToolTip.SetToolTip(chkAutoCopy, "Automatically copies current macro to clipboard as it is changed")
+        ToolTip.SetToolTip(chkAlert, "Show a chat alert as the last step of each" & vbNewLine & "macro in a multi-macro series to let you know" & vbNewLine & "when to use the next macro")
         ToolTip.SetToolTip(txtWaitBuff, "Wait time after buff-type abilities" & vbNewLine & "(Great Strides, Steady Hand, etc.)")
         ToolTip.SetToolTip(txtWaitAction, "Wait time after action-type abilities" & vbNewLine & "(Synthesis, Touch, etc.)")
         ToolTip.SetToolTip(btnClear, "Clear current macro")
+        ToolTip.SetToolTip(btnClearAll, "Clear all macros")
         ToolTip.SetToolTip(btnEraseStep, "Go back one step")
         tabMacro.TabPages.Add(0, "Macro 1")
         ReDim strMacros(0)
@@ -487,15 +489,41 @@
         If intLineIndex(tabMacro.SelectedIndex) <> 15 And intLineIndex(tabMacro.SelectedIndex) <> 0 Then
             txtOutput.Text += vbNewLine
         End If
+        If intLineIndex(tabMacro.SelectedIndex) = 14 Then
+            'Final line of the macro.  Check for alert.
+            If chkAlert.Checked = True Then
+                txtOutput.Text += "/echo USE MACRO " & tabMacro.SelectedIndex + 2 & " NOW"
+                intLineIndex(tabMacro.SelectedIndex) += 1
+            End If
+        End If
         If intLineIndex(tabMacro.SelectedIndex) = 15 Then
-            ReDim Preserve strMacros(UBound(strMacros) + 1)
-            ReDim Preserve intLineIndex(UBound(intLineIndex) + 1)
-            tabMacro.TabPages.Add(UBound(strMacros), "Macro " & intMacroIndex)
-            tabMacro.SelectedIndex += 1
+            'Macro full. Create new tab
+            If tabMacro.SelectedIndex <> UBound(strMacros) Then
+                'Not the last macro, append following action to next available page
+                Dim i As Integer
+                For i = tabMacro.SelectedIndex To UBound(strMacros)
+
+                    If intLineIndex(i) < 15 Then
+                        tabMacro.SelectedIndex = i
+                        Exit For
+                    End If
+                Next
+                'MessageBox.Show(UBound(strMacros))
+                If i = UBound(strMacros) + 1 Then
+                    'reached the last macro with no available space.  Create new tab
+                    NewTab()
+
+                ElseIf intLineIndex(tabMacro.SelectedIndex) <> 0 And intLineIndex(tabMacro.SelectedIndex) <> 15 Then
+                    txtOutput.Text += vbNewLine
+                End If
+            Else
+                NewTab()
+            End If
+
+
             'txtOutput.Text += vbNewLine & "MACRO " & intMacroIndex & vbNewLine
 
-            intMacroIndex += 1
-            intLineIndex(tabMacro.SelectedIndex) = 0
+
             intCP(tabMacro.SelectedIndex, intLineIndex(tabMacro.SelectedIndex)) = CP
             intTotalCP -= CP
         Else
@@ -504,6 +532,16 @@
         End If
         txtCP.Text = intTotalCP
     End Sub
+
+    Private Sub NewTab()
+        ReDim Preserve strMacros(UBound(strMacros) + 1)
+        ReDim Preserve intLineIndex(UBound(intLineIndex) + 1)
+        tabMacro.TabPages.Add(UBound(strMacros), "Macro " & intMacroIndex)
+        intMacroIndex += 1
+        tabMacro.SelectedIndex = UBound(strMacros)
+        intLineIndex(tabMacro.SelectedIndex) = 0
+    End Sub
+
     Private Sub Wait(ByVal buff As Boolean)
         If intLineIndex(tabMacro.SelectedIndex) < 15 Then
             If buff = True Then
